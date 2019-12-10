@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse_lazy
 from estoque.core.models import TimeStampedModel
 from estoque.jogo.models import Jogo
 
@@ -19,11 +20,20 @@ class Armazenamento(TimeStampedModel):
 		ordering = ('-created',)
 
 	def __str__(self):
-		return str(self.pk) 
+		return '{} - {} - {}'.format(self.pk, self.nf, self.created.strftime('%d-%m-%y'))
+
+	def get_absolute_url(self):
+		return reverse_lazy('armazenamento:armazenamento_entrada_detail', kwargs={'pk': self.pk})
+
+	def nf_formated(self):
+		return str(self.nf).zfill(3)
 
 
 class ArmazenamentoItens(models.Model):
-	armazenamento = models.ForeignKey(Armazenamento, on_delete=models.CASCADE)
+	armazenamento = models.ForeignKey(Armazenamento,
+	 on_delete=models.CASCADE, 
+	 related_name='armazenamentos'
+	 )
 	jogo = models.ForeignKey(Jogo, on_delete=models.CASCADE)
 	quantidade = models.PositiveIntegerField()
 	saldo = models.PositiveIntegerField()

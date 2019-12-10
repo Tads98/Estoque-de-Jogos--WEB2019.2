@@ -31,6 +31,9 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=[], cast=Csv())
 # Application definition
 
 INSTALLED_APPS = [
+    #App-de-terceiros
+    'widget_tweaks',
+    'bootstrapform',
     #Apps
     'estoque.core',
     'estoque.jogo',

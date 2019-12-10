@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %}
+{% load bootstrap %}
+
+{% block css %}
+	
+	<style>
+		span.required:after {
+			content: "*";
+			color: red;
+		}
+		.form-control {
+			margin: 10px;
+		}
+	</style>
+
+{% endblock css %}
+
+{% block content %}
+
+<a href="{% url 'armazenamento:armazenamento_entrada_list' %}">Voltar</a>
+
+<div class="row">
+	<div class="cols">
+			<form method="POST" novalidate>
+				{% csrf_token %}
+				<legend style="border-bottom: 1px solid #e5e5e5;">Armazenamento de Entrada</legend>
+
+				<div class="row">
+					<div class="col-sm-6">
+						{% for field in form.visible_fields %}
+					<div class="form-group{% if field.errors %} has-error {% endif%}">
+						<label for="{{ field.id_for_label }}">
+							{% if field.field.required %}
+								<span class="required">{{ field.label }} </span>
+								{% else %}
+									{{ field.label }}
+								{% endif %}
+							</label>
+							{% render_field field class="form-control" %}
+							{% for error in field.errors %}
+								<span class="text-muted">{{ error }}</span>
+							{% endfor %}
+							</div>
+						 {% endfor %}
+					 {{ formset.management_form }}
+					 </div>
+					</div>
+
+						<div class="row">
+							<div class="col-sm-12">
+								<legend style="border-bottom: 1px solid #e5e5e5;">Jogos</legend>
+								<div id="armazenamento" class="form-inline">
+								 {% for item_armazenamento_form in formset %}
+									 <div id="item-{{ forloop.counter0 }}" class="form-group">
+										 {{ item_armazenamento_form|bootstrap }}
+									 </div>
+								 {% endfor %}
+								</div>
+							</div>
+						</div>
+						
+						<span id="add-item" class="btn btn-info" style="margin-top: 10px;"><i class="fa fa-plus"></i>Adicionar
+						</span>
+
+						<div class="row float-right">
+							<div class="col-sm-12" style="margin-top: 10px;">
+								<div class="form-inline buttons">
+									<button class="btn btn-primary" value="Save">
+										<i class="fa fa-floppy-o"></i>
+										Salvar
+									</button>
+									<a href="{% url 'armazenamento:armazenamento_entrada_list' %}" class="btn btn-danger">
+								 <i class="fa fa-times"></i>
+								 Cancelar
+								</a>
+							</div>
+						</div>
+					 </div>
+
+			</form>
+	</div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+
+<script>
+	$(document).ready(function() {
+		// Inserir-classe-no-primeiro-item-de-produto
+		$('#id_armazenamento-0-jogo').addClass('clJogo');
+		$('#id_armazenamento-0-quantidade').addClass('clQuantidade');
+
+	 $('#add-item').click(function(ev) {
+		 ev.preventDefault();
+		 var count = $('#armazenamento').children().length;
+		 var tmplMarkup = $('#item-armazenamento').html();
+		 var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+		 $('div#armazenamento').append(compiledTmpl);
+
+		 // update form count
+		 $('#id_armazenamento-TOTAL_FORMS').attr('value', count + 1);
+		 $('html, body').animate({
+			 scrollTop: $("#add-item").position().top - 200
+		 }, 800);
+
+		 $('#id_armazenamento-' + (count) + '-jogo').addClass('clJogo');
+		 $('#id_armazenamento-' + (count) + '-quantidade').addClass('clQuantidade');
+	 });
+	});
+
+	let armazenamento
+	let saldo
+	let campo
+	let quantidade
+
+	$(document).on('change', '.clJogo', function() {
+		let self = $(this)
+		let pk = $(this).val()
+		let url = '/jogo/' + pk + '/json/'
+
+		$.ajax({
+			url: url,
+			type: 'GET',
+			success: function(response) {
+				armazenamento = response.data[0].armazenamento
+				campo = self.attr('id').replace('jogo', 'quantidade')
+				// Remove o valor do campo quantidade
+				$('#'+campo).val('')
+			},
+			error: function(xhr) {
+				//body...
+
+			}
+
+		})
+
+	});
+
+	$(document).on('change', '.clQuantidade', function() {
+		quantidade = $(this).val();
+		saldo = Number(quantidade) + Number(armazenamento);
+		campo = $(this).attr('id').replace('quantidade', 'saldo')
+		// Atribui o saldo ao campo 'saldo'
+		$('#'+campo).val(saldo)
+	});
+
+
+</script>
+
+<script type="text/html" id="item-armazenamento">
+	<div id="item-__prefix__" class="form-group">
+	{{ formset.empty_form|bootstrap }}
+	</div>
+</script>
+
+{% endblock js %}

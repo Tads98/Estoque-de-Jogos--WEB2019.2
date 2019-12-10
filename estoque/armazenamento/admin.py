@@ -11,7 +11,7 @@ class ArmazenamentoItensInline(admin.TabularInline):
 @admin.register(Armazenamento)
 class ArmazenamentoAdmin(admin.ModelAdmin):
 	inlines = (ArmazenamentoItensInline,)
-	list_display = ('__str__', 'nf')
+	list_display = ('__str__', 'nf', 'funcionario',)
 	search_fields = ('nf',)
 	list_filter = ('funcionario',)
 	date_hierarchy = 'created'
