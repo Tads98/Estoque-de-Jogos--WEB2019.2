@@ -3,6 +3,7 @@ from django.db import models
 from django.urls import reverse_lazy
 from estoque.core.models import TimeStampedModel
 from estoque.jogo.models import Jogo
+from .managers import ArmazenamentoEntradaManager, ArmazenamentoSaidaManager
 
 # Create your models here.
 
@@ -22,11 +23,34 @@ class Armazenamento(TimeStampedModel):
 	def __str__(self):
 		return '{} - {} - {}'.format(self.pk, self.nf, self.created.strftime('%d-%m-%y'))
 
-	def get_absolute_url(self):
-		return reverse_lazy('armazenamento:armazenamento_entrada_detail', kwargs={'pk': self.pk})
 
 	def nf_formated(self):
 		return str(self.nf).zfill(3)
+
+class ArmazenamentoEntrada(Armazenamento):
+
+	objects = ArmazenamentoEntradaManager()
+
+	class Meta:
+		proxy = True
+		verbose_name = 'armazenamento entrada'
+		verbose_name_plural = 'armazenamento entrada'
+
+	def get_absolute_url(self):
+		return reverse_lazy('armazenamento:armazenamento_entrada_detail', kwargs={'pk': self.pk})
+
+
+class ArmazenamentoSaida(Armazenamento):
+
+	objects = ArmazenamentoSaidaManager()
+
+	class Meta:
+		proxy = True
+		verbose_name = 'armazenamento saida'
+		verbose_name_plural = 'armazenamento saida'
+
+	def get_absolute_url(self):
+		return reverse_lazy('armazenamento:armazenamento_saida_detail', kwargs={'pk': self.pk})
 
 
 class ArmazenamentoItens(models.Model):
