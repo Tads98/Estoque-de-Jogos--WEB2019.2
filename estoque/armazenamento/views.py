@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.forms import inlineformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, resolve_url
@@ -34,6 +35,7 @@ def dar_baixa_armazenamento(request):
 Se aprofundar nos conceitos de entrada_add para compreender
 melhor a lógica da def armazenamento_entrada_add(Ler artigo)
 '''
+@login_required
 def armazenamento_entrada_add(request):
 	template_name = 'armazenamento_entrada_form.html'
 	armazenamento_form = Armazenamento()
@@ -79,7 +81,7 @@ def armazenamento_saida_detail(request, pk):
 	context = {'object': obj}
 	return render(request, template_name, context)
 
-
+@login_required
 def armazenamento_saida_add(request):
 	template_name = 'armazenamento_saida_form.html'
 	armazenamento_form = Armazenamento()
